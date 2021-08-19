@@ -325,6 +325,19 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
       });
     const deleteObjectsStub = sinon.stub().resolves();
     const headObjectStub = sinon.stub().rejects({ code: 'AWS_S3_HEAD_OBJECT_NOT_FOUND' });
+    const getObjectStub = sinon.stub().resolves({
+      Body: JSON.stringify({
+        Resources: {
+          ArtifactFunction: {
+            Properties: {
+              Code: {
+                S3Key: `${s3BucketPrefix}/1589988704351-2020-05-20T15:31:44.359Z/artifact.zip`,
+              },
+            },
+          },
+        },
+      }),
+    });
     const awsRequestStubMap = {
       ...baseAwsRequestStubMap,
       ECR: {
@@ -337,6 +350,7 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
         listObjectsV2: listObjectsV2Stub,
         headObject: headObjectStub,
         upload: s3UploadStub,
+        getObject: getObjectStub,
       },
       CloudFormation: {
         describeStacks: { Stacks: [{}] },
