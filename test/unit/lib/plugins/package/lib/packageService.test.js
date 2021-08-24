@@ -272,6 +272,7 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
   describe('pre-prepared artifact with absolute artifact path', () => {
     describe('while deploying whole service', () => {
       const s3UploadStub = sinon.stub();
+      const headObjectStub = sinon.stub().rejects({ code: 'AWS_S3_HEAD_OBJECT_NOT_FOUND' });
       const awsRequestStubMap = {
         Lambda: {
           getFunction: {
@@ -283,6 +284,7 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
         S3: {
           upload: s3UploadStub,
           listObjectsV2: {},
+          headObject: headObjectStub,
         },
         CloudFormation: {
           describeStacks: {},
@@ -296,6 +298,11 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
             Arn: 'arn:aws:iam::999999999999:user/test',
           },
         },
+      };
+      const artifactHashes = {
+        'absoluteArtifact': '35bf6607dc21241d5abca2fc383913dded8295eb3e09cb666d8e79217e802342',
+        'artifact-function': 'd67a87ead541955c743ba86e1664cae115eaced5bf2e71d5371277bb96ec6c39',
+        'artifact': '9f0353d71151d1d0e6d2fdd3d923db1d3787c4f16dc1745eb8d50d339ae3dbcf',
       };
 
       beforeEach(() => {
@@ -324,7 +331,7 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
         });
 
         const callArgs = s3UploadStub.args.find((item) =>
-          item[0].Key.endsWith('absoluteArtifact.zip')
+          item[0].Key.endsWith(`code-artifacts/${artifactHashes.absoluteArtifact}.zip`)
         );
         expect(callArgs[0].Body.path).to.equal(absoluteArtifactFilePath);
       });
@@ -346,7 +353,7 @@ describe('test/unit/lib/plugins/package/lib/packageService.test.js', () => {
         });
 
         const callArgs = s3UploadStub.args.find((item) =>
-          item[0].Key.endsWith('absoluteArtifact.zip')
+          item[0].Key.endsWith(`code-artifacts/${artifactHashes.absoluteArtifact}.zip`)
         );
         expect(callArgs[0].Body.path).to.equal(absoluteArtifactFilePath);
       });

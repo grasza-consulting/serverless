@@ -244,6 +244,7 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
     const s3UploadStub = sinon.stub().resolves();
     const updateStackStub = sinon.stub().resolves({});
     const deleteObjectsStub = sinon.stub().resolves({});
+    const headObjectStub = sinon.stub().rejects({ code: 'AWS_S3_HEAD_OBJECT_NOT_FOUND' });
     const awsRequestStubMap = {
       ...baseAwsRequestStubMap,
       ECR: {
@@ -254,6 +255,7 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
       S3: {
         deleteObjects: deleteObjectsStub,
         listObjectsV2: { Contents: [] },
+        headObject: headObjectStub,
         upload: s3UploadStub,
       },
       CloudFormation: {
@@ -322,6 +324,7 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
         ],
       });
     const deleteObjectsStub = sinon.stub().resolves();
+    const headObjectStub = sinon.stub().rejects({ code: 'AWS_S3_HEAD_OBJECT_NOT_FOUND' });
     const awsRequestStubMap = {
       ...baseAwsRequestStubMap,
       ECR: {
@@ -332,6 +335,7 @@ describe('test/unit/lib/plugins/aws/deploy/index.test.js', () => {
       S3: {
         deleteObjects: deleteObjectsStub,
         listObjectsV2: listObjectsV2Stub,
+        headObject: headObjectStub,
         upload: s3UploadStub,
       },
       CloudFormation: {
